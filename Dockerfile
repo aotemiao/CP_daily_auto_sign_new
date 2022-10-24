@@ -7,7 +7,7 @@ COPY . /code
 WORKDIR /code
 
 RUN apt-get -y update && apt-get install ffmpeg libsm6 libxext6  -y
-RUN pip install -r requirements.txt
+RUN pip install -i http://mirrors.aliyun.com/pypi/simple -r requirements.txt
 
 ENV TZ=Asia/Shanghai
 

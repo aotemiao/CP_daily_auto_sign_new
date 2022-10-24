@@ -2,16 +2,18 @@
 import json
 import sys
 import time
-
+import logging
 import schedule
 
 from tasks.login import get_login_session
 from tasks.send_email import Mail
 from tasks.sign import sign
 
+log = logging.getLogger()
+
 
 def job():
-    print(time.strftime("%Y-%m-%d %H:%M", time.localtime()))
+    log.info(time.strftime("%Y-%m-%d %H:%M", time.localtime()))
     with open("configure.json", encoding="utf-8") as f:
         configure = json.load(f)
         students = configure["students"]
@@ -35,23 +37,23 @@ def job():
                     else:
                         message += student["name"] + " fail! Login Success! Check Error!\n"
         except Exception as e:
-            print(e)
+            log.error(e)
             message = ""
             for student in students:
                 message = student["name"] + "fail! Configure Error!\n"
-        print(message)
+        log.info(message)
         try:
             if mail is not None:
                 subject = time.strftime("%Y-%m-%d %H:%M", time.localtime()) + "打卡结果"
                 mail.send(subject, message)
         except Exception as e:
-            print("Email not send!")
-            print(e)
+            log.error("Email not send!")
+            log.error(e)
 
 
 def sign_thread(threadName):
     # changed to only one check in per day since 2022-03-25
-    schedule.every().day.at("08:22").do(job)
+    schedule.every().day.at("08:02").do(job)
     while True:
         schedule.run_pending()
         time.sleep(1)
@@ -64,8 +66,9 @@ if __name__ == '__main__':
         if arg == "-r":
             runOnce = True
     if runOnce:
-        print("Run once mode")
+        log.info("Run once mode")
         job()
     else:
-        print("Run in daemon mode, use Ctrl+C to exit, add '-r' to run once")
+        job()
+        log.info("Run in daemon mode, use Ctrl+C to exit, add '-r' to run once")
         sign_thread("sign")

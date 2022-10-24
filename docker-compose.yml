@@ -1,0 +1,10 @@
+version: "3.7"
+services:
+  app:
+    image: 93ef2fb7fd23
+    volumes:
+      - type: bind
+        source: ./configure.json
+        target: /code/configure.json
+    command: ["python3","manage.py"]
+    restart: always
